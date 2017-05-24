@@ -25,7 +25,6 @@ namespace BackgroundApplication
 
 
 
-            txtBox = "aaaa";
 
         }
 
