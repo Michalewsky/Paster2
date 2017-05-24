@@ -2,7 +2,7 @@
 using System.Windows;
 
 
-namespace BackgroundApplication
+namespace PasterApp
 {
   /// <summary>
   /// Interaction logic for MainWindow.xaml

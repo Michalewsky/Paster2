@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Windows;
 
-namespace BackgroundApplication
+namespace PasterApp
 {
 
     public partial class App : Application
@@ -17,7 +17,7 @@ namespace BackgroundApplication
 
             _notifyIcon = new System.Windows.Forms.NotifyIcon();
             _notifyIcon.DoubleClick += (s, args) => ShowMainWindow();
-            _notifyIcon.Icon = BackgroundApplication.Properties.Resources.PasterIcon;
+            _notifyIcon.Icon = PasterApp.Properties.Resources.PasterIcon;
             _notifyIcon.Visible = true;
 
             CreateContextMenu();
