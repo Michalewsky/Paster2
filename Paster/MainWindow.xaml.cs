@@ -127,10 +127,64 @@ namespace PasterApp
         }
         #endregion
 
+        /*
+        [ComImport(), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        [Guid("000214e8-0000-0000-c000-000000000046")]
+        internal interface IShellExtInit
+        {
+            void Initialize(
+                IntPtr pidlFolder,
+                IntPtr pDataObj,
+                IntPtr  hKeyProgID);
+        }
+        [ComImport(), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        [Guid("000214e4-0000-0000-c000-000000000046")]
+        internal interface IContextMenu
+        {
+            [PreserveSig]
+            int QueryContextMenu(
+                IntPtr  hMenu,
+                uint iMenu,
+                uint idCmdFirst,
+                uint idCmdLast,
+                uint uFlags);
+            void InvokeCommand(IntPtr pici);
+            void GetCommandString(
+                UIntPtr idCmd,
+                uint uFlags,
+                IntPtr pReserved,
+                System.Text.StringBuilder pszName,
+                uint cchMax);
+        }
 
+        [ClassInterface(ClassInterfaceType.None)]
+        [Guid("B1F1405D-94A1-4692-B72F-FC8CAF8B8700"), ComVisible(true)]
+        public class FileContextMenuExt : IShellExtInit, IContextMenu
+        {
+            public void Initialize(IntPtr pidlFolder, IntPtr pDataObj, IntPtr hKeyProgID)
+            {
+        
+    }
 
+            public int QueryContextMenu(IntPtr hMenu, uint iMenu, uint idCmdFirst, uint idCmdLast, uint uFlags)
+            {
+        
+            }
+            public void InvokeCommand(IntPtr pici)
+            {
+        
+            }
+            public void GetCommandString(
+                UIntPtr idCmd,
+                uint uFlags,
+                IntPtr pReserved,
+                System.Text.StringBuilder pszName,
+                uint cchMax)
+            {
+            }
+        }
 
-
+*/
         protected virtual void ShowClipboard()
         {
 
