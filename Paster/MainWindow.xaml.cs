@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System;
+﻿using System;
 using System.IO;
 using System.ComponentModel;
 using System.Windows;
@@ -12,81 +11,150 @@ using System.Runtime.InteropServices;
 
 namespace PasterApp
 {
-    
-  public partial class MainWindow : Window
-  {
-    private string txtPlaceholder = "Placeholder for data from Clipboard";
-    private bool isViewing;
-    private HwndSource hWndSource;
-    private IntPtr hWndNextViewer;
 
-    public MainWindow()
+    public partial class App : Application
     {
-        InitializeComponent();
-        
+        private System.Windows.Forms.NotifyIcon _notifyIcon;
+        private bool _isExit;
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            MainWindow = new MainWindow();
+            MainWindow.Closing += MainWindow_Closing;
+
+            _notifyIcon = new System.Windows.Forms.NotifyIcon();
+            _notifyIcon.DoubleClick += (s, args) => ShowMainWindow();
+            _notifyIcon.Icon = PasterApp.Properties.Resources.INTPaster;
+            _notifyIcon.Visible = true;
+
+            CreateContextMenu();
+            ShowMainWindow();
+
+        }
+
+        private void CreateContextMenu()
+        {
+            _notifyIcon.ContextMenuStrip =
+              new System.Windows.Forms.ContextMenuStrip();
+            _notifyIcon.ContextMenuStrip.Items.Add("Open").Click += (s, e) => ShowMainWindow();
+            _notifyIcon.ContextMenuStrip.Items.Add("Exit").Click += (s, e) => ExitApplication();
+        }
+
+        private void ExitApplication()
+        {
+            _isExit = true;
+            MainWindow.Close();
+            _notifyIcon.Dispose();
+            _notifyIcon = null;
+        }
+
+        private void ShowMainWindow()
+        {
+            if (MainWindow.IsVisible)
+            {
+                if (MainWindow.WindowState == WindowState.Minimized)
+                {
+                    MainWindow.WindowState = WindowState.Normal;
+                }
+                MainWindow.Activate();
+            }
+            else
+            {
+                MainWindow.Show();
+            }
+        }
+
+        private void MainWindow_Closing(object sender, CancelEventArgs e)
+        {
+            if (!_isExit)
+            {
+                e.Cancel = true;
+                MainWindow.Hide();
+            }
+        }
+
+
+
     }
 
+    public partial class MainWindow : Window
+    {
+        private string txtPlaceholder = "Placeholder for data from Clipboard";
+        private bool isViewing;
+        private HwndSource hWndSource;
+        private IntPtr hWndNextViewer;
 
-    #region Win32 Clipboard handlers
+        public MainWindow()
+        {
+            InitializeComponent();
+
+        }
+
+
+        #region Win32 Clipboard handlers
         internal static class Win32
-    {
-        internal const int WM_DRAWCLIPBOARD = 0x0308;
-        internal const int WM_CHANGECBCHAIN = 0x030D;
+        {
+            internal const int WM_DRAWCLIPBOARD = 0x0308;
+            internal const int WM_CHANGECBCHAIN = 0x030D;
 
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        internal static extern IntPtr SetClipboardViewer(IntPtr hWndNewViewer);
+            [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+            internal static extern IntPtr SetClipboardViewer(IntPtr hWndNewViewer);
 
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        internal static extern bool ChangeClipboardChain(IntPtr hWndRemove, IntPtr hWndNewNext);
+            [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+            internal static extern bool ChangeClipboardChain(IntPtr hWndRemove, IntPtr hWndNewNext);
 
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        internal static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
-    }
+            [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+            internal static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
+        }
         #endregion
 
-    #region Button Handlers
-    private void ClearBtn_Click(object sender, RoutedEventArgs e)
-    {
-        txtBox.Text = txtPlaceholder;
-        Clipboard.Clear();
-    }
+        #region Button Handlers
+        private void ClearBtn_Click(object sender, RoutedEventArgs e)
+        {
+            txtBox.Text = txtPlaceholder;
+            Clipboard.Clear();
+        }
 
-    private void GetBtn_Click(object sender, RoutedEventArgs e)
-    {
-        ShowClipboard();
-    }
+        private void GetBtn_Click(object sender, RoutedEventArgs e)
+        {
+            ShowClipboard();
+        }
 
-    private void SwitchBtn_Click(object sender, RoutedEventArgs e)
-    {
-        StartViewing();
-    }
-    #endregion
+        private void SwitchBtn_Click(object sender, RoutedEventArgs e)
+        {
+            StartViewing();
+        }
+        #endregion
 
 
 
 
 
         protected virtual void ShowClipboard()
-    {
-
-        var CopiedText = txtPlaceholder;
-        CopiedText = Clipboard.GetText(); ;
-        txtBox.Text = CopiedText;
-
-
-        if (!string.IsNullOrWhiteSpace(CopiedText))
         {
+
+            var CopiedText = txtPlaceholder;
+            CopiedText = Clipboard.GetText(); ;
             txtBox.Text = CopiedText;
-        }
-        else
-        {
-            txtBox.Text = txtPlaceholder;
-        }
-            
-    }
 
-        private void parseText(string text)
+
+            if (!string.IsNullOrWhiteSpace(CopiedText))
+            {
+                txtBox.Text = CopiedText;
+            }
+            else
+            {
+                txtBox.Text = txtPlaceholder;
+            }
+
+        }
+
+        static Array parseText(string text)
         {
+            string[] elements;
+            elements = text.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries);
+            return elements;
 
         }
 
@@ -95,8 +163,8 @@ namespace PasterApp
             WindowInteropHelper wih = new WindowInteropHelper(this);
             hWndSource = HwndSource.FromHwnd(wih.Handle);
 
-            hWndSource.AddHook(this.WinProc);   
-            hWndNextViewer = Win32.SetClipboardViewer(hWndSource.Handle); 
+            hWndSource.AddHook(this.WinProc);
+            hWndNextViewer = Win32.SetClipboardViewer(hWndSource.Handle);
             isViewing = true;
         }
 
@@ -116,9 +184,9 @@ namespace PasterApp
                     break;
 
                 case Win32.WM_DRAWCLIPBOARD:
-                this.DrawContent();
-                Win32.SendMessage(hWndNextViewer, msg, wParam, lParam);
-                break;
+                    this.DrawContent();
+                    Win32.SendMessage(hWndNextViewer, msg, wParam, lParam);
+                    break;
             }
 
             return IntPtr.Zero;
@@ -136,6 +204,7 @@ namespace PasterApp
                 tb.Text = Clipboard.GetText();
                 tb.IsReadOnly = true;
                 tb.TextWrapping = TextWrapping.NoWrap;
+                
                 pnlContent.Children.Add(tb);
             }
             /*else if (Clipboard.ContainsFileDropList())
@@ -189,7 +258,7 @@ namespace PasterApp
         }
 
 
-        
+
 
         private void CloseCBViewer()
         {
