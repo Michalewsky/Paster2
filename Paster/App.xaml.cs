@@ -8,7 +8,7 @@ namespace PasterApp
     {
         private System.Windows.Forms.NotifyIcon _notifyIcon;
         private bool _isExit;
-        
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -21,8 +21,8 @@ namespace PasterApp
             _notifyIcon.Visible = true;
 
             CreateContextMenu();
-
-        }
+            ShowMainWindow();
+        }   
 
         private void CreateContextMenu()
         {

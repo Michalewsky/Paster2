@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System;
 using System.IO;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -21,12 +22,13 @@ namespace PasterApp
 
     public MainWindow()
     {
-      InitializeComponent();
-      //ShowClipboard();
+        InitializeComponent();
+        
     }
 
+
     #region Win32 Clipboard handlers
-    internal static class Win32
+        internal static class Win32
     {
         internal const int WM_DRAWCLIPBOARD = 0x0308;
         internal const int WM_CHANGECBCHAIN = 0x030D;
@@ -40,9 +42,10 @@ namespace PasterApp
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         internal static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
     }
-    #endregion
+        #endregion
 
-        private void ClearBtn_Click(object sender, RoutedEventArgs e)
+    #region Button Handlers
+    private void ClearBtn_Click(object sender, RoutedEventArgs e)
     {
         txtBox.Text = txtPlaceholder;
         Clipboard.Clear();
@@ -53,7 +56,17 @@ namespace PasterApp
         ShowClipboard();
     }
 
-    protected virtual void ShowClipboard()
+    private void SwitchBtn_Click(object sender, RoutedEventArgs e)
+    {
+        StartViewing();
+    }
+    #endregion
+
+
+
+
+
+        protected virtual void ShowClipboard()
     {
 
         var CopiedText = txtPlaceholder;
@@ -82,8 +95,8 @@ namespace PasterApp
             WindowInteropHelper wih = new WindowInteropHelper(this);
             hWndSource = HwndSource.FromHwnd(wih.Handle);
 
-            hWndSource.AddHook(this.WinProc);   // start processing window messages
-            hWndNextViewer = Win32.SetClipboardViewer(hWndSource.Handle);   // set this window as a viewer
+            hWndSource.AddHook(this.WinProc);   
+            hWndNextViewer = Win32.SetClipboardViewer(hWndSource.Handle); 
             isViewing = true;
         }
 
@@ -94,20 +107,16 @@ namespace PasterApp
                 case Win32.WM_CHANGECBCHAIN:
                     if (wParam == hWndNextViewer)
                     {
-                        // clipboard viewer chain changed, need to fix it.
                         hWndNextViewer = lParam;
                     }
                     else if (hWndNextViewer != IntPtr.Zero)
                     {
-                        // pass the message to the next viewer.
                         Win32.SendMessage(hWndNextViewer, msg, wParam, lParam);
                     }
                     break;
 
                 case Win32.WM_DRAWCLIPBOARD:
-                // clipboard content changed
                 this.DrawContent();
-                // pass the message to the next viewer.
                 Win32.SendMessage(hWndNextViewer, msg, wParam, lParam);
                 break;
             }
@@ -121,7 +130,6 @@ namespace PasterApp
 
             if (Clipboard.ContainsText())
             {
-                // we have some text in the clipboard.
                 TextBox tb = new TextBox();
                 tb.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
                 tb.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
@@ -166,8 +174,7 @@ namespace PasterApp
             }
         }
 
-
-        private void SwitchBtn_Click(object sender, RoutedEventArgs e)
+        private void StartViewing()
         {
             if (!isViewing)
             {
@@ -180,6 +187,9 @@ namespace PasterApp
                 SwitchBtn.Content = "Start";
             }
         }
+
+
+        
 
         private void CloseCBViewer()
         {
