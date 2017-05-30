@@ -74,8 +74,6 @@ namespace PasterApp
             }
         }
 
-
-
     }
 
     public partial class MainWindow : Window

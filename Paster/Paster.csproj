@@ -51,7 +51,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>F9D64BD5CD6D11BF5F40D1C1B399E43ACB1D688C</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>120D7423D9A68379D46D7B6A382FF1564B930D59</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>Paster_TemporaryKey.pfx</ManifestKeyFile>
